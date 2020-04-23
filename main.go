@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+
+	pwl "github.com/justjanne/powerline-go/powerline"
 )
 
 type alignment int
@@ -69,8 +71,8 @@ func pathExists(path string) bool {
 }
 
 func getValidCwd() string {
-	cwd, exists := os.LookupEnv("PWD")
-	if !exists {
+	cwd, err := os.Getwd()
+	if err != nil {
 		warn("Your current directory is invalid.")
 		print("> ")
 		os.Exit(1)
@@ -89,13 +91,15 @@ func getValidCwd() string {
 	return cwd
 }
 
-var modules = map[string]func(*powerline){
+var modules = map[string]func(*powerline) []pwl.Segment{
 	"aws":                 segmentAWS,
 	"cwd":                 segmentCwd,
 	"docker":              segmentDocker,
+	"docker-context":      segmentDockerContext,
 	"dotenv":              segmentDotEnv,
 	"duration":            segmentDuration,
 	"exit":                segmentExitCode,
+	"gcp":                 segmentGCP,
 	"git":                 segmentGit,
 	"gitlite":             segmentGitLite,
 	"hg":                  segmentHg,
@@ -110,6 +114,7 @@ var modules = map[string]func(*powerline){
 	"perms":               segmentPerms,
 	"root":                segmentRoot,
 	"shell-var":           segmentShellVar,
+	"shenv":               segmentShEnv,
 	"ssh":                 segmentSSH,
 	"termtitle":           segmentTermTitle,
 	"terraform-workspace": segmentTerraformWorkspace,
@@ -147,7 +152,7 @@ func main() {
 		ColorizeHostname: flag.Bool(
 			"colorize-hostname",
 			false,
-			comments("Colorize the hostname based on a hash of itself")),
+			comments("Colorize the hostname based on a hash of itself, or use the PLGO_HOSTNAMEFG and/or PLGO_HOSTNAMEBG env vars.")),
 		HostnameOnlyIfSSH: flag.Bool(
 			"hostname-only-if-ssh",
 			false,
@@ -183,17 +188,17 @@ func main() {
 			"modules",
 			"venv,user,host,ssh,cwd,perms,git,hg,jobs,exit,root",
 			commentsWithDefaults("The list of modules to load, separated by ','",
-				"(valid choices: aws, cwd, docker, dotenv, duration, exit, git, gitlite, hg, host, jobs, kube, load, newline, nix-shell, node, perlbrew, perms, plenv, root, shell-var, ssh, svn, termtitle, terraform-workspace, time, user, venv, vgo)")),
+				"(valid choices: aws, cwd, docker, docker-context, dotenv, duration, exit, git, gitlite, hg, host, jobs, kube, load, newline, nix-shell, node, perlbrew, perms, plenv, root, shell-var, shenv, ssh, svn, termtitle, terraform-workspace, time, user, venv, vgo)")),
 		ModulesRight: flag.String(
 			"modules-right",
 			"",
 			comments("The list of modules to load anchored to the right, for shells that support it, separated by ','",
-				"(valid choices: aws, cwd, docker, dotenv, duration, exit, git, gitlite, hg, host, jobs, kube, load, newline, nix-shell, node, perlbrew, perms, plenv, root, shell-var, ssh, svn, termtitle, terraform-workspace, time, user, venv, vgo)")),
+				"(valid choices: aws, cwd, docker, docker-context, dotenv, duration, exit, git, gitlite, hg, host, jobs, kube, load, newline, nix-shell, node, perlbrew, perms, plenv, root, shell-var, shenv, ssh, svn, termtitle, terraform-workspace, time, user, venv, vgo)")),
 		Priority: flag.String(
 			"priority",
 			"root,cwd,user,host,ssh,perms,git-branch,git-status,hg,jobs,exit,cwd-path",
 			commentsWithDefaults("Segments sorted by priority, if not enough space exists, the least priorized segments are removed first. Separate with ','",
-				"(valid choices: aws, cwd, docker, dotenv, duration, exit, git, gitlite, hg, host, jobs, kube, load, newline, nix-shell, node, perlbrew, perms, plenv, root, shell-var, ssh, svn, termtitle, terraform-workspace, time, user, venv, vgo)")),
+				"(valid choices: aws, cwd, docker, docker-context, dotenv, duration, exit, git, gitlite, hg, host, jobs, kube, load, newline, nix-shell, node, perlbrew, perms, plenv, root, shell-var, shenv, ssh, svn, termtitle, terraform-workspace, time, user, venv, vgo)")),
 		MaxWidthPercentage: flag.Int(
 			"max-width",
 			0,

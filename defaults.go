@@ -137,6 +137,9 @@ var themes = map[string]Theme{
 		SvnChangesFg: 22, // dark green
 		SvnChangesBg: 148,
 
+		GCPFg: 117,
+		GCPBg: 26,
+
 		GitAheadFg:      250,
 		GitAheadBg:      240,
 		GitBehindFg:     250,
@@ -172,6 +175,9 @@ var themes = map[string]Theme{
 
 		ShellVarFg: 52,
 		ShellVarBg: 11,
+
+		ShEnvFg: 15,
+		ShEnvBg: 130,
 
 		NodeFg: 15,
 		NodeBg: 40,
@@ -533,6 +539,9 @@ var themes = map[string]Theme{
 		TimeFg: 236,
 		TimeBg: 15,
 
+		ShEnvFg: 130,
+		ShEnvBg: 15,
+
 		LoadFg:           15,
 		LoadBg:           22,
 		LoadHighBg:       161,
@@ -861,6 +870,8 @@ var themes = map[string]Theme{
 		TimeBg:             0,
 		ShellVarFg:         1,
 		ShellVarBg:         11,
+		ShEnvFg:            15,
+		ShEnvBg:            9,
 		NodeFg:             15,
 		NodeBg:             40,
 		LoadFg:             15,
@@ -1189,6 +1200,8 @@ var themes = map[string]Theme{
 		TimeBg:             0,
 		ShellVarFg:         1,
 		ShellVarBg:         11,
+		ShEnvFg:            15,
+		ShEnvBg:            9,
 		NodeFg:             15,
 		NodeBg:             40,
 		LoadFg:             15,
